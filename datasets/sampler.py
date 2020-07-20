@@ -6,6 +6,8 @@ import numpy
 from pathlib import Path
 from argparse import ArgumentParser
 
+data_path = Path(__file__).absolute().parent.parent / 'data'
+
 def load_mesh(filename, device='cuda:0', dtype=torch.float64):
     """
     Reads a mesh from the given filename.
@@ -14,6 +16,10 @@ def load_mesh(filename, device='cuda:0', dtype=torch.float64):
         faces: LongTensor of shape (F, 3)
     """
     # Using open3d functions for reading file, for broader format support
+    filename = str(filename)
+
+    if not Path(filename).is_file():
+        raise ValueError("No such file %s" % filename)
 
     o3d_mesh = o3d.io.read_triangle_mesh(filename, print_progress=True)
     
@@ -34,6 +40,7 @@ def save_pcd(filename, pt3_pcd):
     Returns None
     """
     # Using open3d functions for writing the file
+    filename = str(filename)
 
     verts = o3d.utility.Vector3dVector(pt3_pcd.points_list()[0])
     o3d_pcd = o3d.geometry.PointCloud(verts)
@@ -56,8 +63,8 @@ if __name__ == "__main__":
     sam_v = int((args.points if args.points else num_v * (args.ratio if args.ratio else 1.5)))
     points = sample_points_from_meshes(mesh, num_samples=sam_v)
     pt3_pcd = pytorch3d.structures.Pointclouds(points)
-    print("Sampled %d points from mesh" % len(pt3_pcd.points_list()[0]))
+    print("Sampled %d points from given mesh" % len(pt3_pcd.points_list()[0]))
 
-    save_pcd(args.output, pt3_pcd)
+    save_pcd(data_path / args.output, pt3_pcd)
     print("Done!")
 
