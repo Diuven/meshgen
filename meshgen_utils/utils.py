@@ -3,7 +3,7 @@ from . import fileio as io
 from .visualize import o3d_visualize
 
 
-def initial_data(filename, depth=7):
+def initial_data(filename, scale=1.1, depth=7):
     """
     Reads point cloud from the given filename, and returns initialized mesh and point cloud
     Returns (mesh, pcd):
@@ -14,7 +14,7 @@ def initial_data(filename, depth=7):
     filename = str(filename)
 
     o3d_pcd = io.load_o3d_pcd(filename)
-    o3d_mesh = mesh_ops.poisson_mesh(o3d_pcd, depth=depth)
+    o3d_mesh = mesh_ops.poisson_mesh(o3d_pcd, scale=scale, depth=depth)
     pt3_mesh = io.o2p_mesh(o3d_mesh)
     pt3_pcd = io.o2p_pcd(o3d_pcd)
 

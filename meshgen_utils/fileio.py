@@ -100,7 +100,7 @@ def save_o3d_pcd(filename, o3d_pcd):
         print("No such directory %s. Creating..." % str(Path(filename).parent))
         Path(filename).parent.mkdir(parents=True)
 
-    o3d.io.write_point_cloud(filename, o3d_pcd)
+    o3d.io.write_point_cloud(filename, o3d_pcd, write_ascii=True)
 
 
 def save_o3d_mesh(filename, o3d_mesh):
