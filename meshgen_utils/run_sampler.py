@@ -22,15 +22,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     o3d_mesh = load_o3d_mesh(args.mesh_file)
-    pt3_mesh = o2p_mesh(o3d_mesh)
+    pt3_mesh = o2p_mesh(o3d_mesh, dtype=torch.float32)
     num_v = len(pt3_mesh.verts_list()[0])
-    print("Loaded mesh with %d vertices and %d faces" % (num_v, len(mesh.faces_list()[0])))
+    print("Loaded mesh with %d vertices and %d faces" % (num_v, len(pt3_mesh.faces_list()[0])))
 
     sam_v = int((args.points if args.points else num_v * (args.ratio if args.ratio else 1.5)))
-    points = sample_points(mesh, num_samples=sam_v)
+    points = sample_points(pt3_mesh, num_samples=sam_v)
     pt3_pcd = pytorch3d.structures.Pointclouds(points)
     print("Sampled %d points from given mesh" % len(pt3_pcd.points_list()[0]))
 
-    save_pcd(data_path / args.output, pt3_pcd)
+    o3d_pcd = p2o_pcd(pt3_pcd)
+    save_o3d_pcd(data_path / args.output, o3d_pcd)
     print("Done!")
 
