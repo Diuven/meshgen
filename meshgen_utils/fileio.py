@@ -1,5 +1,6 @@
 import torch
 import pytorch3d
+from pytorch3d import structures as pt3_struct
 import open3d as o3d
 import numpy
 from pathlib import Path
@@ -14,7 +15,7 @@ def o2p_mesh(o3d_mesh, device='cuda:0', dtype=torch.float64):
     faces = numpy.asarray(o3d_mesh.triangles)
     faces = torch.Tensor(faces).to(device=device)
 
-    pt3_mesh = pytorch3d.structures.Meshes([verts], [faces]).to(device=device)
+    pt3_mesh = pt3_struct.Meshes([verts], [faces]).to(device=device)
 
     return pt3_mesh
 
@@ -26,7 +27,7 @@ def o2p_pcd(o3d_pcd, device='cuda:0', dtype=torch.float64):
     points = numpy.asarray(o3d_pcd.points)
     points = torch.Tensor(points).to(device=device, dtype=dtype)
 
-    pt3_pcd = pytorch3d.structures.Pointclouds([points]).to(device=device)
+    pt3_pcd = pt3_struct.Pointclouds([points]).to(device=device)
 
     return pt3_pcd
 
