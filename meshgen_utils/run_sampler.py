@@ -6,7 +6,7 @@ import numpy
 from pathlib import Path
 from argparse import ArgumentParser
 
-from .fileio import *
+from fileio import *
 
 
 data_path = Path(__file__).absolute().parent.parent / 'data'

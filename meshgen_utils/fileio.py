@@ -19,13 +19,27 @@ def o2p_mesh(o3d_mesh, device='cuda:0', dtype=torch.float64):
     return pt3_mesh
 
 
+def o2p_pcd(o3d_pcd, device='cuda:0', dtype=torch.float64):
+    """
+    Convert opend3d type point cloud to pytorch3d type point cloud
+    """
+    points = numpy.asarray(o3d_pcd.points)
+    points = torch.Tensor(points).to(device=device, dtype=dtype)
+
+    pt3_pcd = pytorch3d.structures.Pointclouds([points]).to(device=device)
+
+    return pt3_pcd
+
+
 def p2o_mesh(pt3_mesh):
     """
     Convert pytorch3d type mesh to open3d type mesh
     """
     # batch num?
-    verts = o3d.utility.Vector3dVector(pt3_mesh.verts_list()[0])
-    faces = o3d.utility.Vector3iVector(pt3_mesh.faces_list()[0])
+    verts = numpy.asarray(pt3_mesh.verts_list()[0].to('cpu'))
+    verts = o3d.utility.Vector3dVector(verts)
+    faces = numpy.asarray(pt3_mesh.faces_list()[0].to('cpu'))
+    faces = o3d.utility.Vector3iVector(faces)
     o3d_mesh = o3d.geometry.TriangleMesh(verts, faces)
 
     return o3d_mesh
@@ -36,7 +50,8 @@ def p2o_pcd(pt3_pcd):
     Convert pytorch3d type point cloud to open3d type point cloud
     """
     # batch num?
-    verts = o3d.utility.Vector3dVector(pt3_pcd.points_list()[0])
+    verts = numpy.asarray(pt3_pcd.points_list()[0].to('cpu'))
+    verts = o3d.utility.Vector3dVector(verts)
     o3d_pcd = o3d.geometry.PointCloud(verts)
 
     return o3d_pcd
