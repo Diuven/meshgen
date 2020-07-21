@@ -56,4 +56,4 @@ def show_overlay(pt3_mesh, pt3_pcd):
     o3d_pcd = io.p2o_pcd(pt3_pcd)
     o3d_pcd.paint_uniform_color([0.5, 0.75, 0.5])
 
-    o3d_visualize([o3d_mesh, o3d_pcd])
+    o3d_visualize([o3d_mesh, o3d_pcd], overlay=True)
