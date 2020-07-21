@@ -46,15 +46,23 @@ def get_keybindings(geometries, overlay):
     helpstring += '\nR: toggle rotation'
     keybindings[ord('r')] = keybindings[ord('R')] = register_rotation
 
-    # V: verbose (show point normal, mesh wire)
-    def show_verbose(vis):
+    # N: point normal vector
+    def show_normal(vis):
         ropt = vis.get_render_option()
         ropt.point_show_normal = not ropt.point_show_normal
+        return False
+    
+    helpstring += '\nN: toggle point normal vector view'
+    keybindings[ord('n')] = keybindings[ord('N')] = show_normal
+
+    # W: mesh wireframe
+    def show_wireframe(vis):
+        ropt = vis.get_render_option()
         ropt.mesh_show_wireframe = not ropt.mesh_show_wireframe
         return False
     
-    helpstring += '\nV: toggle verbose display (point normal vector, mesh wireframe)'
-    keybindings[ord('v')] = keybindings[ord('V')] = show_verbose
+    helpstring += '\nW: toggle mesh wireframe view'
+    keybindings[ord('w')] = keybindings[ord('W')] = show_wireframe
 
     # B: mesh back face
     def show_back_face(vis):
