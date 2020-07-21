@@ -6,7 +6,7 @@ import numpy
 from pathlib import Path
 
 
-def o2p_mesh(o3d_mesh, device='cuda:0', dtype=torch.float64):
+def o2p_mesh(o3d_mesh, device='cuda:0', dtype=torch.float32):
     """
     Convert open3d type mesh to pytorch3d type mesh
     """
@@ -20,14 +20,22 @@ def o2p_mesh(o3d_mesh, device='cuda:0', dtype=torch.float64):
     return pt3_mesh
 
 
-def o2p_pcd(o3d_pcd, device='cuda:0', dtype=torch.float64):
+def o2p_pcd(o3d_pcd, device='cuda:0', dtype=torch.float32):
     """
     Convert opend3d type point cloud to pytorch3d type point cloud
     """
     points = numpy.asarray(o3d_pcd.points)
     points = torch.Tensor(points).to(device=device, dtype=dtype)
+    points = [points]
 
-    pt3_pcd = pt3_struct.Pointclouds([points]).to(device=device)
+    if o3d_pcd.has_normals():
+        normals = numpy.asarray(o3d_pcd.normals)
+        normals = torch.Tensor(normals).to(device=device, dtype=dtype)
+        normals = [normals]
+    else:
+        normals = None
+
+    pt3_pcd = pt3_struct.Pointclouds(points, normals).to(device=device)
 
     return pt3_pcd
 
@@ -53,7 +61,13 @@ def p2o_pcd(pt3_pcd):
     # batch num?
     verts = numpy.asarray(pt3_pcd.points_list()[0].to('cpu'))
     verts = o3d.utility.Vector3dVector(verts)
+
     o3d_pcd = o3d.geometry.PointCloud(verts)
+
+    if pt3_pcd.normals_list() is not None:
+        norms = numpy.asarray(pt3_pcd.normals_list()[0].to('cpu'))
+        norms = o3d.utility.Vector3dVector(norms)
+        o3d_pcd.normals = norms
 
     return o3d_pcd
 

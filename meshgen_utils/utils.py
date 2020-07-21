@@ -3,7 +3,7 @@ from . import fileio as io
 from .visualize import o3d_visualize
 
 
-def initial_data(filename, scale=1.1, depth=7):
+def initial_data(filename, method='poisson', **kargs):
     """
     Reads point cloud from the given filename, and returns initialized mesh and point cloud
     Returns (mesh, pcd):
@@ -12,9 +12,24 @@ def initial_data(filename, scale=1.1, depth=7):
     """
 
     filename = str(filename)
+    method = method.lower()
+    possible_methods = ('alpha', 'convex', 'poisson')
 
     o3d_pcd = io.load_o3d_pcd(filename)
-    o3d_mesh = mesh_ops.poisson_mesh(o3d_pcd, scale=scale, depth=depth)
+
+    if method not in possible_methods:
+        raise ValueError('method %s should be one of %s' % (method, possible_methods))
+    if method == 'alpha':
+        reconstruct = mesh_ops.alpha_mesh
+    elif method == 'convex':
+        reconstruct = mesh_ops.convex_mesh
+    elif method == 'poisson':
+        reconstruct = mesh_ops.poisson_mesh
+    else:
+        raise RuntimeError()
+
+    o3d_mesh = reconstruct(o3d_pcd, **kargs)
+
     pt3_mesh = io.o2p_mesh(o3d_mesh)
     pt3_pcd = io.o2p_pcd(o3d_pcd)
 

@@ -1,6 +1,6 @@
 import open3d as o3d
 
-def o3d_visualize(geometries):
+def o3d_visualize(geometries, verbose=True):
     """
     Visualize objects in GUI
     parameters:
@@ -18,5 +18,5 @@ def o3d_visualize(geometries):
     else:
         raise TypeError("Object not visualizable: %s" % geometries)
 
-    o3d.visualization.draw_geometries(geometries)
+    o3d.visualization.draw_geometries(geometries, point_show_normal=verbose, mesh_show_back_face=verbose, mesh_show_wireframe=verbose)
 
