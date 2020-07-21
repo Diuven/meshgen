@@ -73,6 +73,20 @@ def get_keybindings(geometries, overlay):
     helpstring += '\nB: toggle mesh back face view'
     keybindings[ord('b')] = keybindings[ord('B')] = show_back_face
 
+    # C: point cloud color option
+    def switch_point_color(vis):
+        cand, idx = switch_point_color.candidates, switch_point_color.index
+        switch_point_color.index = idx = (idx + 1) % len(cand)
+        ropt = vis.get_render_option()
+        ropt.point_color_option = cand[idx]
+        # return True for update geometry
+        return True
+    pco = o3d.visualization.PointColorOption
+    switch_point_color.candidates, switch_point_color.index = (pco.Color, pco.Normal, pco.XCoordinate, pco.YCoordinate, pco.ZCoordinate), 0
+
+    helpstring += '\nC: switch point color options'
+    keybindings[ord('c')] = keybindings[ord('C')] = switch_point_color
+
     if overlay:
         # if this is for mesh / pcd overlay mode (probably from utils.show_overlay)
         # urghh.... duplicate code....
@@ -115,7 +129,9 @@ def run_visualizer(geometries, overlay, keybindings):
     vis = o3d.visualization.VisualizerWithKeyCallback()
     vis.create_window()
     
-    vis.get_render_option().mesh_show_back_face = True
+    ropt = vis.get_render_option()
+    ropt.mesh_show_back_face = True
+    ropt.point_color_option = o3d.visualization.PointColorOption.Color
 
     for geo in geometries:
         vis.add_geometry(geo)

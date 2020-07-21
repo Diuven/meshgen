@@ -68,6 +68,8 @@ def p2o_pcd(pt3_pcd):
         norms = numpy.asarray(pt3_pcd.normals_list()[0].to('cpu'))
         norms = o3d.utility.Vector3dVector(norms)
         o3d_pcd.normals = norms
+    else:
+        o3d_pcd.estimate_normals()
 
     return o3d_pcd
 
