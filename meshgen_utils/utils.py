@@ -1,7 +1,10 @@
+from pathlib import Path
+
 from . import mesh_ops
 from . import fileio as io
 from .visualize import o3d_visualize
 
+data_path = Path(__file__).absolute().parent.parent / 'data'
 
 def initial_data(filename, method='poisson', **kargs):
     """
@@ -15,7 +18,7 @@ def initial_data(filename, method='poisson', **kargs):
     method = method.lower()
     possible_methods = ('alpha', 'convex', 'poisson')
 
-    o3d_pcd = io.load_o3d_pcd(filename)
+    o3d_pcd = io.load_o3d_pcd(data_path / filename)
 
     if method not in possible_methods:
         raise ValueError('method %s should be one of %s' % (method, possible_methods))
