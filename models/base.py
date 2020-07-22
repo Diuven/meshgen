@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
-from torch.optim import Adam
+from torch.optim import Adam, SGD
 from pytorch_lightning.core import LightningModule
 from abc import ABC, abstractmethod
 from pytorch3d.structures import Meshes
@@ -18,11 +18,11 @@ class BaseModule(LightningModule, ABC):
         pass
 
     def get_loss(self, mesh):
-        loss = mesh_to_pcd_distance(mesh, self.source_pcd)
+        loss = mesh_to_pcd_distance(mesh, self.source_pcd) * 1000
         return loss
 
     def configure_optimizers(self):
-        return Adam(self.parameters(), lr=self.hp.train.lr)
+        return SGD(self.parameters(), lr=self.hp.train.lr)
 
     def log_mesh(self, mesh, tag, step=None):
         verts = mesh.verts_padded()
@@ -54,12 +54,3 @@ class BaseModule(LightningModule, ABC):
         dataset = torch.zeros(self.hp.train.epoch_size) # placeholder dataset
         loader = DataLoader(dataset, batch_size=1, num_workers=16)
         return loader
-
-    # def test_dataloader(self):
-    #     if self.initial_mesh is None:
-    #         mesh, pcd = utils.initial_data(self.input_file, method=self.hp.method)
-    #         self.initial_mesh = self.current_mesh = mesh
-    #         self.source_pcd = pcd
-        
-    #     loader = DataLoader(torch.zeros(1), batch_size=1)
-    #     return loader

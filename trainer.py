@@ -20,6 +20,9 @@ def main(args):
 
     trainer = Trainer(logger=logger, max_epochs=args.max_epochs, gpus=-1)
     trainer.fit(net)
+    
+    mesh, pcd = net.current_mesh, net.source_pcd
+    utils.show_overlay(mesh, pcd)
 
 
 if __name__ == "__main__":

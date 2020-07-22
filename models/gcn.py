@@ -30,14 +30,14 @@ class GCN(BaseModule):
         # how to add vertices?
 
         # coordinates of vertices (temporary)
-        # verts = mesh.verts_padded()[0]
-        norms = mesh.verts_normals_padded()[0]
-        # verts = torch.rand_like(verts)
+        verts = mesh.verts_padded()[0]
+        # norms = mesh.verts_normals_padded()[0]
+        vfeat0 = torch.rand_like(verts)
         edges = mesh.edges_packed() # Change when batch size != 1
 
-        vfeat1 = torch.sigmoid(self.gcn1(norms, edges))
-        vfeat2 = torch.sigmoid(self.gcn2(vfeat1, edges))
-        vfeat3 = torch.sigmoid(self.gcn3(vfeat2, edges))
-        vdiff = torch.sigmoid(self.gcn4(vfeat3, edges))
+        vfeat1 = torch.relu(self.gcn1(vfeat0, edges))
+        vfeat2 = torch.relu(self.gcn2(vfeat1, edges))
+        vfeat3 = torch.relu(self.gcn3(vfeat2, edges))
+        vdiff = self.gcn4(vfeat3, edges)
         
         return vdiff
