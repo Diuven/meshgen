@@ -1,11 +1,11 @@
 data:
-    file: 'pillow_pcd.ply'
-    method: 'poisson'
-    divide: 2
+    file: 'triceratops.ply'
+    method: 'convex'
+    divide: 1
 train:
     epoch_size: 64
     lr: 0.05
 model:
     hidden_dim1: 256
     hidden_dim2: 64
-    scale: 0.002
+    scale: 0.005

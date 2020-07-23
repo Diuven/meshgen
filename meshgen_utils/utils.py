@@ -1,5 +1,7 @@
 from pathlib import Path
 from pytorch3d.ops import SubdivideMeshes
+import open3d as o3d
+import numpy as np
 from glob import glob
 
 from . import mesh_ops
@@ -47,30 +49,31 @@ def initial_data(filename, method='poisson', divide_mesh=0, **kargs):
     return pt3_mesh, pt3_pcd
 
 
-# def save_mesh(filename, pt3_mesh):
-#     """
-#     Saves pytorch3d type mesh into the given filename
-#     """
-#     filename = str(filename)
-#     o3d_mesh = io.p2o_mesh(pt3_mesh)
-#     io.save_o3d_mesh(o3d_mesh)
-
-
-def save_result(save_path, epoch_num, pt3_mesh, pt3_pcd=None):
+def save_result(save_path, epoch_num, pt3_mesh, pt3_pcd=None, deform=None):
     """
     Saves mesh (and pcd) in save_path 
     """
+    save_path = Path(save_path)
     if epoch_num == -1:
         mesh_path = 'mesh_last.ply'
+        deform_path = 'deform_last.ply'
     else:
-        mesh_path = ('mesh_%04d.ply' % epoch_num)
-    mesh_path = Path(save_path) / mesh_path
+        mesh_path = 'mesh_%04d.ply' % epoch_num
+        deform_path = 'deform_%04d.ply' % epoch_num
+    mesh_path = save_path / mesh_path
+    deform_path = save_path / deform_path
+
     o3d_mesh = io.p2o_mesh(pt3_mesh)
     io.save_o3d_mesh(mesh_path, o3d_mesh)
 
     if pt3_pcd is not None:
         o3d_pcd = io.p2o_pcd(pt3_pcd)
-        io.save_o3d_pcd(Path(save_path) / 'pcd.ply', o3d_pcd)
+        io.save_o3d_pcd(save_path / 'pcd.ply', o3d_pcd)
+    
+    if deform is not None:
+        o3d_deform_pcd = o3d.geometry.PointCloud(o3d_mesh.vertices)
+        o3d_deform_pcd.normals = o3d.utility.Vector3dVector(np.asarray(deform.detach().to('cpu')))
+        io.save_o3d_pcd(deform_path, o3d_deform_pcd)
     
     print('Results saved in %s' % str(mesh_path))
 
@@ -79,24 +82,42 @@ def load_result(load_path, epoch_num):
     """
     Loads results (saved with function above) and show with visualizer
     """
+    load_path = Path(load_path)
     # Unefficient operations (pt3 -> o3d -> pt3), but who cares
     if epoch_num == -1:
         mesh_path = 'mesh_last.ply'
+        deform_path = 'deform_last.ply'
     else:
-        mesh_path = ('mesh_%04d.ply' % epoch_num)
-    mesh_path = Path(load_path) / mesh_path
+        mesh_path = 'mesh_%04d.ply' % epoch_num
+        deform_path = 'deform_%04d.ply' % epoch_num
+    mesh_path = load_path / mesh_path
+    deform_path = load_path / deform_path
+
     o3d_mesh = io.load_o3d_mesh(mesh_path)
     pt3_mesh = io.o2p_mesh(o3d_mesh)
 
-    o3d_pcd = io.load_o3d_pcd(Path(load_path) / 'pcd.ply')
+    o3d_pcd = io.load_o3d_pcd(load_path / 'pcd.ply')
     pt3_pcd = io.o2p_pcd(o3d_pcd)
+
+    if deform_path.exists() and deform_path.is_file():
+        o3d_deform_pcd = io.load_o3d_pcd(deform_path)
+
+        SCALE = 100
+        scaled_deform = SCALE * np.asarray(o3d_deform_pcd.normals)
+        deform_mean = np.mean(scaled_deform ** 2)
+        print("Squared mean of scaled (x%d) deform vectors: %f" % (SCALE, deform_mean))
+
+        o3d_deform_pcd.normals = o3d.utility.Vector3dVector(scaled_deform)
+        pt3_deform_pcd = io.o2p_pcd(o3d_deform_pcd)
+    else:
+        pt3_deform_pcd = None
 
     print("Showing results from %s" % str(mesh_path))
 
-    show_overlay(pt3_mesh, pt3_pcd)
+    show_overlay(pt3_mesh, pt3_pcd, pt3_deform_pcd)
 
 
-def show_overlay(pt3_mesh, pt3_pcd):
+def show_overlay(pt3_mesh, pt3_pcd, pt3_deform_pcd=None):
     """
     Given pytorc3d type mesh and point cloud, visualize overlay of both.
     Point cloud as green, Mesh as Blue
@@ -107,4 +128,11 @@ def show_overlay(pt3_mesh, pt3_pcd):
     o3d_pcd = io.p2o_pcd(pt3_pcd)
     o3d_pcd.paint_uniform_color([0.5, 0.75, 0.5])
 
-    o3d_visualize([o3d_mesh, o3d_pcd], overlay=True)
+    geometries = [o3d_mesh, o3d_pcd]
+
+    if pt3_deform_pcd is not None:
+        o3d_deform_pcd = io.p2o_pcd(pt3_deform_pcd)
+        o3d_deform_pcd.paint_uniform_color([0.75, 0.5, 0.5])
+        geometries += [o3d_deform_pcd]
+
+    o3d_visualize(geometries, overlay=True)

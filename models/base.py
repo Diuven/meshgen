@@ -45,7 +45,8 @@ class BaseModule(LightningModule, ABC):
         if self.current_epoch % 10 == 1:
             save_path = os.path.join(self.logger.log_dir, 'objects')
             mesh, pcd = self.current_mesh, (None if self.current_epoch > 1 else self.source_pcd)
-            utils.save_result(save_path, self.current_epoch, mesh, pcd)
+            deform = (self.deform if hasattr(self, 'deform') else None)
+            utils.save_result(save_path, self.current_epoch, mesh, pcd, deform)
 
         return {'loss': mean_loss, 'log': {'epoch_loss': mean_loss}}
 

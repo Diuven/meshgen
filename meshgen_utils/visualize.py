@@ -117,7 +117,22 @@ def get_keybindings(geometries, overlay):
         show_pcd.geo = geometries[1]
         
         helpstring += '\nP: toggle point cloud visibility'
-        keybindings[ord('p')] = keybindings[ord('P')] = show_pcd      
+        keybindings[ord('p')] = keybindings[ord('P')] = show_pcd
+
+        if len(geometries) >= 3:
+            # D: scaled deform vector view
+            def show_deform(vis):
+                if not show_deform.on:
+                    vis.add_geometry(show_deform.geo, reset_bounding_box=False)
+                else:
+                    vis.remove_geometry(show_deform.geo, reset_bounding_box=False)
+                show_deform.on = not show_deform.on
+                return False
+            show_deform.on = False
+            show_deform.geo = (geometries[2] if len(geometries) == 3 else None)
+
+            helpstring += '\nD: toggle mesh deform vector visibility'
+            keybindings[ord('d')] = keybindings[ord('D')] = show_deform
 
     helpstring += '\nEnjoy!'
     print(helpstring, flush=True)
@@ -133,7 +148,9 @@ def run_visualizer(geometries, overlay, keybindings):
     ropt.mesh_show_back_face = True
     ropt.point_color_option = o3d.visualization.PointColorOption.Color
 
-    for geo in geometries:
+    for idx, geo in enumerate(geometries):
+        if overlay and idx == 2:
+            continue # don't add deform vector at first
         vis.add_geometry(geo)
 
     for key, value in keybindings.items():

@@ -20,7 +20,8 @@ class GCN(BaseModule):
     def next_mesh(self, cmesh):
         # Return updated next mesh from current mesh 
         cverts = cmesh.verts_padded()[0]
-        nverts = cverts + (self(cmesh) * self.hp.model.scale)
+        self.deform = self(cmesh) * self.hp.model.scale
+        nverts = cverts + self.deform
         nmesh = Meshes([nverts], cmesh.faces_list())
         return nmesh
 
