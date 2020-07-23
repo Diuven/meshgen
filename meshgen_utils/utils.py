@@ -18,7 +18,7 @@ def initial_data(filename, method='poisson', divide_mesh=0, **kargs):
 
     filename = str(filename)
     method = method.lower()
-    possible_methods = ('alpha', 'convex', 'poisson')
+    possible_methods = ('alpha', 'convex', 'poisson', 'ball')
 
     o3d_pcd = io.load_o3d_pcd(data_path / filename)
 
@@ -30,6 +30,8 @@ def initial_data(filename, method='poisson', divide_mesh=0, **kargs):
         reconstruct = mesh_ops.convex_mesh
     elif method == 'poisson':
         reconstruct = mesh_ops.poisson_mesh
+    elif method == 'ball':
+        reconstruct = mesh_ops.ball_mesh
     else:
         raise RuntimeError()
 

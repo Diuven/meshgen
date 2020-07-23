@@ -10,11 +10,11 @@ class GCN(BaseModule):
     def __init__(self, hp):
         super().__init__(hp)
         self.hp = hp
+        mhp = self.hp.model
         # input: (V, 6) tensor, (E, 2) tensor
-        self.gcn1 = GraphConv(6, hp.model.hidden_dim1)
-        self.gcn2 = GraphConv(hp.model.hidden_dim1, hp.model.hidden_dim2)
-        self.gcn3 = GraphConv(hp.model.hidden_dim2, hp.model.hidden_dim3)
-        self.gcn4 = GraphConv(hp.model.hidden_dim3, 3)
+        self.gcn1 = GraphConv(6, mhp.hidden_dim1)
+        self.gcn2 = GraphConv(mhp.hidden_dim1, mhp.hidden_dim2)
+        self.gcn3 = GraphConv(mhp.hidden_dim2, 3)
         # output (V, 3) tensor
 
     def next_mesh(self, cmesh):
@@ -37,7 +37,6 @@ class GCN(BaseModule):
 
         vfeat1 = torch.relu(self.gcn1(vfeat0, edges))
         vfeat2 = torch.relu(self.gcn2(vfeat1, edges))
-        vfeat3 = torch.relu(self.gcn3(vfeat2, edges))
-        vdiff = torch.tanh(self.gcn4(vfeat3, edges))
+        vdiff = torch.tanh(self.gcn3(vfeat2, edges))
         
         return vdiff

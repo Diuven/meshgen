@@ -31,4 +31,13 @@ def convex_mesh(o3d_pcd):
     return mesh
 
 
-# Ball pivoting?
+def ball_mesh(o3d_pcd, radii=[0.005, 0.01, 0.02, 0.04, 0.1]):
+    """
+    Create an open3d type mesh from open3d type point cloud by alpha shape reconstruction
+    """
+    # Better estimate?
+    if not o3d_pcd.has_normals():
+        o3d_pcd.estimate_normals()
+    mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(o3d_pcd, o3d.utility.DoubleVector(radii))
+    return mesh
+
