@@ -132,4 +132,4 @@ def save_o3d_mesh(filename, o3d_mesh):
         print("No such directory %s. Creating..." % str(Path(filename).parent))
         Path(filename).parent.mkdir(parents=True)
     
-    o3d.io.write_triangle_mesh(filename, o3d_mesh)
+    o3d.io.write_triangle_mesh(filename, o3d_mesh, write_ascii=True)

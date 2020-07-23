@@ -1,12 +1,12 @@
 data:
     file: 'triceratops.ply'
     method: 'convex'
-    divide: True
+    divide: 2
 train:
-    epoch_size: 256
+    epoch_size: 64
     lr: 0.05
 model:
     hidden_dim1: 10
     hidden_dim2: 50
     hidden_dim3: 20
-    scale: 0.005
+    scale: 0.002

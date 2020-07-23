@@ -10,8 +10,8 @@ class GCN(BaseModule):
     def __init__(self, hp):
         super().__init__(hp)
         self.hp = hp
-        # input: (V, 3) tensor, (E, 2) tensor
-        self.gcn1 = GraphConv(3, hp.model.hidden_dim1)
+        # input: (V, 6) tensor, (E, 2) tensor
+        self.gcn1 = GraphConv(6, hp.model.hidden_dim1)
         self.gcn2 = GraphConv(hp.model.hidden_dim1, hp.model.hidden_dim2)
         self.gcn3 = GraphConv(hp.model.hidden_dim2, hp.model.hidden_dim3)
         self.gcn4 = GraphConv(hp.model.hidden_dim3, 3)
@@ -32,12 +32,12 @@ class GCN(BaseModule):
         # coordinates of vertices (temporary)
         verts = mesh.verts_padded()[0]
         # norms = mesh.verts_normals_padded()[0]
-        vfeat0 = torch.rand_like(verts)
+        vfeat0 = torch.cat((verts, torch.rand_like(verts)), dim=1)
         edges = mesh.edges_packed() # Change when batch size != 1
 
         vfeat1 = torch.relu(self.gcn1(vfeat0, edges))
         vfeat2 = torch.relu(self.gcn2(vfeat1, edges))
         vfeat3 = torch.relu(self.gcn3(vfeat2, edges))
-        vdiff = self.gcn4(vfeat3, edges)
+        vdiff = torch.tanh(self.gcn4(vfeat3, edges))
         
         return vdiff
