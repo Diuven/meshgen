@@ -18,7 +18,7 @@ class BaseModule(LightningModule, ABC):
         pass
 
     def get_loss(self, mesh):
-        loss = mesh_to_pcd_distance(mesh, self.source_pcd) * 1000
+        loss = mesh_to_pcd_distance(mesh, self.source_pcd)
         return loss
 
     def configure_optimizers(self):
@@ -45,7 +45,8 @@ class BaseModule(LightningModule, ABC):
 
     def train_dataloader(self):
         # Return pytorch dataloader, yielding zero tensor for each batch
-        mesh, pcd = utils.initial_data(self.hp.data.file, method=self.hp.data.method)
+        dhp = self.hp.data
+        mesh, pcd = utils.initial_data(dhp.file, method=dhp.method, divide_mesh=dhp.divide)
         self.initial_mesh = self.current_mesh = mesh.to(device='cuda')
         self.source_pcd = pcd.to(device='cuda')
         self.log_mesh(self.initial_mesh, 'initial mesh')

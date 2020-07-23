@@ -1,4 +1,5 @@
 from pathlib import Path
+from pytorch3d.ops import SubdivideMeshes
 
 from . import mesh_ops
 from . import fileio as io
@@ -6,7 +7,7 @@ from .visualize import o3d_visualize
 
 data_path = Path(__file__).absolute().parent.parent / 'data'
 
-def initial_data(filename, method='poisson', **kargs):
+def initial_data(filename, method='poisson', divide_mesh=False, **kargs):
     """
     Reads point cloud from the given filename, and returns initialized mesh and point cloud
     Returns (mesh, pcd):
@@ -35,6 +36,10 @@ def initial_data(filename, method='poisson', **kargs):
 
     pt3_mesh = io.o2p_mesh(o3d_mesh)
     pt3_pcd = io.o2p_pcd(o3d_pcd)
+
+    if divide_mesh:
+        divider = SubdivideMeshes()
+        pt3_mesh = divider(pt3_mesh)
 
     return pt3_mesh, pt3_pcd
 

@@ -5,7 +5,7 @@ def mesh_to_pcd_distance(mesh, pcd):
     """
     https://pytorch3d.readthedocs.io/en/latest/modules/loss.html#pytorch3d.loss.point_mesh_face_distance
     """
-    face_loss = point_mesh_face_distance(mesh, pcd)
+    # face_loss = point_mesh_face_distance(mesh, pcd)
     edge_loss = point_mesh_edge_distance(mesh, pcd)
-    point_loss = chamfer_distance(mesh.verts_padded(), pcd)[0]
-    return face_loss + edge_loss
+    # point_loss = chamfer_distance(mesh.verts_padded(), pcd)[0]
+    return edge_loss
