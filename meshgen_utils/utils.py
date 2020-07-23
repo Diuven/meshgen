@@ -1,5 +1,6 @@
 from pathlib import Path
 from pytorch3d.ops import SubdivideMeshes
+from glob import glob
 
 from . import mesh_ops
 from . import fileio as io
@@ -44,13 +45,53 @@ def initial_data(filename, method='poisson', divide_mesh=False, **kargs):
     return pt3_mesh, pt3_pcd
 
 
-def save_mesh(filename, pt3_mesh):
+# def save_mesh(filename, pt3_mesh):
+#     """
+#     Saves pytorch3d type mesh into the given filename
+#     """
+#     filename = str(filename)
+#     o3d_mesh = io.p2o_mesh(pt3_mesh)
+#     io.save_o3d_mesh(o3d_mesh)
+
+
+def save_result(save_path, epoch_num, pt3_mesh, pt3_pcd=None):
     """
-    Saves pytorch3d type mesh into the given filename
+    Saves mesh (and pcd) in save_path 
     """
-    filename = str(filename)
+    if epoch_num == -1:
+        mesh_path = 'mesh_last.ply'
+    else:
+        mesh_path = ('mesh_%04d.ply' % epoch_num)
+    mesh_path = Path(save_path) / mesh_path
     o3d_mesh = io.p2o_mesh(pt3_mesh)
-    io.save_o3d_mesh(o3d_mesh)
+    io.save_o3d_mesh(mesh_path, o3d_mesh)
+
+    if pt3_pcd is not None:
+        o3d_pcd = io.p2o_pcd(pt3_pcd)
+        io.save_o3d_pcd(Path(save_path) / 'pcd.ply', o3d_pcd)
+    
+    print('Results saved in %s' % str(mesh_path))
+
+
+def load_result(load_path, epoch_num):
+    """
+    Loads results (saved with function above) and show with visualizer
+    """
+    # Unefficient operations (pt3 -> o3d -> pt3), but who cares
+    if epoch_num == -1:
+        mesh_path = 'mesh_last.ply'
+    else:
+        mesh_path = ('mesh_%04d.ply' % epoch_num)
+    mesh_path = Path(load_path) / mesh_path
+    o3d_mesh = io.load_o3d_mesh(mesh_path)
+    pt3_mesh = io.o2p_mesh(o3d_mesh)
+
+    o3d_pcd = io.load_o3d_pcd(Path(load_path) / 'pcd.ply')
+    pt3_pcd = io.o2p_pcd(o3d_pcd)
+
+    print("Showing results from %s" % str(mesh_path))
+
+    show_overlay(pt3_mesh, pt3_pcd)
 
 
 def show_overlay(pt3_mesh, pt3_pcd):

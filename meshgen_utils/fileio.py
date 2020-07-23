@@ -111,8 +111,9 @@ def save_o3d_pcd(filename, o3d_pcd):
     """
     # Using open3d functions for writing the file
     filename = str(filename)
+    parent = Path(filename).parent
 
-    if not Path(filename).parent.is_dir:
+    if not parent.exists() or  not parent.is_dir:
         print("No such directory %s. Creating..." % str(Path(filename).parent))
         Path(filename).parent.mkdir(parents=True)
 
@@ -125,8 +126,9 @@ def save_o3d_mesh(filename, o3d_mesh):
     Returns None
     """
     filename = str(filename)
+    parent = Path(filename).parent
 
-    if not Path(filename).parent.is_dir:
+    if not parent.exists() or  not parent.is_dir:
         print("No such directory %s. Creating..." % str(Path(filename).parent))
         Path(filename).parent.mkdir(parents=True)
     

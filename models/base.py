@@ -2,8 +2,9 @@ import torch
 from torch.utils.data import DataLoader
 from torch.optim import Adam, SGD
 from pytorch_lightning.core import LightningModule
-from abc import ABC, abstractmethod
 from pytorch3d.structures import Meshes
+from abc import ABC, abstractmethod
+import os
 
 from .loss import mesh_to_pcd_distance
 from meshgen_utils import utils
@@ -40,6 +41,11 @@ class BaseModule(LightningModule, ABC):
     def training_epoch_end(self, outputs):
         self.log_mesh(self.current_mesh, 'output_mesh', self.current_epoch * self.hp.train.epoch_size)
         mean_loss = torch.stack([x['loss'] for x in outputs]).mean()
+
+        if self.current_epoch % 10 == 1:
+            save_path = os.path.join(self.logger.log_dir, 'objects')
+            mesh, pcd = self.current_mesh, (None if self.current_epoch > 1 else self.source_pcd)
+            utils.save_result(save_path, self.current_epoch, mesh, pcd)
 
         return {'loss': mean_loss, 'log': {'epoch_loss': mean_loss}}
 

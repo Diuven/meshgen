@@ -3,6 +3,7 @@ from pytorch_lightning.loggers import TensorBoardLogger
 from argparse import ArgumentParser
 from omegaconf import OmegaConf
 from pathlib import Path
+import os
 
 from meshgen_utils import utils
 from models import GCN
@@ -23,6 +24,8 @@ def main(args):
     
     mesh, pcd = net.current_mesh, net.source_pcd
     utils.show_overlay(mesh, pcd)
+    utils.save_result(os.path.join(logger.log_dir, 'objects'), -1, mesh, pcd)
+    print("Done!")
 
 
 if __name__ == "__main__":
