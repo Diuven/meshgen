@@ -1,20 +1,21 @@
 import torch
 from torch import nn
-from pytorch3d.ops import GraphConv
+# from pytorch3d.ops import GraphConv
 from pytorch3d.structures import Meshes
+from torch_geometric import nn as gnn
 
 from .base import BaseModule
 
-class GCN(BaseModule):
+class MeshRefineGCN(BaseModule):
     # batch size should be 1 for now
     def __init__(self, hp):
         super().__init__(hp)
         self.hp = hp
         mhp = self.hp.model
-        # input: (V, 6) tensor, (E, 2) tensor
-        self.gcn1 = GraphConv(6, mhp.hidden_dim1)
-        self.gcn2 = GraphConv(mhp.hidden_dim1, mhp.hidden_dim2)
-        self.gcn3 = GraphConv(mhp.hidden_dim2, 3)
+        # input: (V, [3,6]) tensor, (E, 2) tensor
+        self.gcn1 = gnn.GCNConv(3, mhp.hidden_dim1, cached=True)
+        self.gcn2 = gnn.GCNConv(mhp.hidden_dim1, mhp.hidden_dim2, cached=True)
+        self.gcn3 = gnn.GCNConv(mhp.hidden_dim2, 3, cached=True)
         # output (V, 3) tensor
 
     def next_mesh(self, cmesh):
@@ -33,8 +34,9 @@ class GCN(BaseModule):
         # coordinates of vertices (temporary)
         verts = mesh.verts_padded()[0]
         # norms = mesh.verts_normals_padded()[0]
-        vfeat0 = torch.cat((verts, torch.rand_like(verts)), dim=1)
-        edges = mesh.edges_packed() # Change when batch size != 1
+        # vfeat0 = torch.cat((verts, torch.rand_like(verts)), dim=1)
+        vfeat0 = torch.rand_like(verts)
+        edges = mesh.edges_packed().transpose(0, 1) # Change when batch size != 1
 
         vfeat1 = torch.relu(self.gcn1(vfeat0, edges))
         vfeat2 = torch.relu(self.gcn2(vfeat1, edges))

@@ -1,1 +1,1 @@
-from .gcn import GCN
+from .refineGcn import MeshRefineGCN
