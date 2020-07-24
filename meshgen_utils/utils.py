@@ -102,7 +102,7 @@ def load_result(load_path, epoch_num):
     if deform_path.exists() and deform_path.is_file():
         o3d_deform_pcd = io.load_o3d_pcd(deform_path)
 
-        SCALE = 100
+        SCALE = 1000
         scaled_deform = SCALE * np.asarray(o3d_deform_pcd.normals)
         deform_mean = np.mean(scaled_deform ** 2)
         print("Squared mean of scaled (x%d) deform vectors: %f" % (SCALE, deform_mean))

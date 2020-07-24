@@ -4,6 +4,7 @@ from torch.optim import Adam, SGD
 from pytorch_lightning.core import LightningModule
 from pytorch3d.structures import Meshes
 from abc import ABC, abstractmethod
+from omegaconf import OmegaConf
 import os
 
 from .loss import mesh_to_pcd_distance
@@ -53,7 +54,8 @@ class BaseModule(LightningModule, ABC):
     def train_dataloader(self):
         # Return pytorch dataloader, yielding zero tensor for each batch
         dhp = self.hp.data
-        mesh, pcd = utils.initial_data(dhp.file, method=dhp.method, divide_mesh=dhp.divide)
+        kargs = OmegaConf.to_container(self.hp.data.kargs)
+        mesh, pcd = utils.initial_data(dhp.file, method=dhp.method, divide_mesh=dhp.divide, **kargs)
         self.initial_mesh = self.current_mesh = mesh.to(device='cuda')
         self.source_pcd = pcd.to(device='cuda')
         self.log_mesh(self.initial_mesh, 'initial mesh')

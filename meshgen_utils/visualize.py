@@ -33,7 +33,7 @@ def get_keybindings(geometries, overlay):
     def register_rotation(vis):
         def rotate_view(vis):
             ctr = vis.get_view_control()
-            ctr.rotate(5.0, 0.0)
+            ctr.rotate(3.0, 0.0)
             return False
         if register_rotation.on:
             vis.register_animation_callback(lambda vis: False)

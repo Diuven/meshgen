@@ -1,9 +1,11 @@
 data:
-    file: 'triceratops.ply'
-    method: 'convex'
-    divide: 1
+    file: 'bowl_pcd.ply'
+    method: 'alpha'
+    divide: 2
+    kargs:
+        alpha: 0.3
 train:
-    epoch_size: 64
+    epoch_size: 128
     lr: 0.05
 model:
     hidden_dim1: 256
