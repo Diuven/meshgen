@@ -34,7 +34,9 @@ class BaseModule(LightningModule, ABC):
     def training_step(self, batch, index):
         cmesh = self.current_mesh
         nmesh = self.next_mesh(cmesh)
-        self.current_mesh = Meshes(nmesh.verts_padded().detach(), nmesh.faces_padded().detach())
+        
+        if self.current_epoch > self.hp.train.study_epoch:
+            self.current_mesh = Meshes(nmesh.verts_padded().detach(), nmesh.faces_padded().detach())
 
         loss = self.get_loss(nmesh)
         return {'loss': loss, 'log': {'loss': loss}}

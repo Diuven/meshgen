@@ -1,12 +1,13 @@
 data:
     file: 'bowl_pcd.ply'
     method: 'alpha'
-    divide: 0
+    divide: 1
     kargs:
         alpha: 0.3
 train:
     epoch_size: 128
     lr: 0.05
+    study_epoch: 100
 model:
     use_pointnet: true
     init_dim: 64
