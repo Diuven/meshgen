@@ -1,13 +1,14 @@
-from pytorch3d.loss import point_mesh_face_distance, point_mesh_edge_distance, chamfer_distance
+from pytorch3d import loss as pt3loss
 from pytorch3d.ops import sample_points_from_meshes
 
 def mesh_to_pcd_distance(mesh, pcd):
     """
     https://pytorch3d.readthedocs.io/en/latest/modules/loss.html#pytorch3d.loss.point_mesh_face_distance
     """
-    # face_loss = point_mesh_face_distance(mesh, pcd)
-    # edge_loss = point_mesh_edge_distance(mesh, pcd)
-    # point_loss = chamfer_distance(mesh.verts_padded(), pcd)[0]
+    # face_loss = pt3loss.point_mesh_face_distance(mesh, pcd)
+    # edge_loss = pt3loss.point_mesh_edge_distance(mesh, pcd)
+    # point_loss = pt3loss.chamfer_distance(mesh.verts_padded(), pcd)[0]
+    length_loss = pt3loss.mesh_edge_loss(mesh)
     mpcd = sample_points_from_meshes(mesh, 2 * pcd.points_padded()[0].shape[0])
-    point_loss, _ = chamfer_distance(mpcd, pcd)
-    return point_loss
+    sample_loss, _ = pt3loss.chamfer_distance(mpcd, pcd)
+    return sample_loss + length_loss * 100
