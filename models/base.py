@@ -35,8 +35,7 @@ class BaseModule(LightningModule, ABC):
         cmesh = self.current_mesh
         nmesh = self.next_mesh(cmesh)
         
-        if self.current_epoch > self.hp.train.study_epoch:
-            self.current_mesh = Meshes(nmesh.verts_padded().detach(), nmesh.faces_padded().detach())
+        self.current_mesh = Meshes(nmesh.verts_padded().detach(), nmesh.faces_padded().detach())
 
         loss = self.get_loss(nmesh)
         return {'loss': loss, 'log': {'loss': loss}}
@@ -45,9 +44,9 @@ class BaseModule(LightningModule, ABC):
         self.log_mesh(self.current_mesh, 'output_mesh', self.current_epoch * self.hp.train.epoch_size)
         mean_loss = torch.stack([x['loss'] for x in outputs]).mean()
 
-        if self.current_epoch % 10 == 1:
+        if self.current_epoch % 10 == 0:
             save_path = os.path.join(self.logger.log_dir, 'objects')
-            mesh, pcd = self.current_mesh, (None if self.current_epoch > 1 else self.source_pcd)
+            mesh, pcd = self.current_mesh, (None if self.current_epoch > 0 else self.source_pcd)
             deform = (self.deform if hasattr(self, 'deform') else None)
             utils.save_result(save_path, self.current_epoch, mesh, pcd, deform)
 
@@ -56,7 +55,7 @@ class BaseModule(LightningModule, ABC):
     def train_dataloader(self):
         # Return pytorch dataloader, yielding zero tensor for each batch
         dhp = self.hp.data
-        kargs = OmegaConf.to_container(self.hp.data.kargs)
+        kargs = (OmegaConf.to_container(dhp.kargs) if dhp.kargs is not None else dict())
         mesh, pcd = utils.initial_data(dhp.file, method=dhp.method, divide_mesh=dhp.divide, **kargs)
         self.initial_mesh = self.current_mesh = mesh.to(device='cuda')
         self.source_pcd = pcd.to(device='cuda')

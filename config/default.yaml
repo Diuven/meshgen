@@ -1,16 +1,10 @@
 data:
-    file: 'bowl_pcd.ply'
-    method: 'alpha'
+    file: 'tiki.ply'
+    method: 'convex'
     divide: 1
-    kargs:
-        alpha: 0.3
 train:
-    epoch_size: 128
+    epoch_size: 32
     lr: 0.05
-    study_epoch: 5
 model:
-    use_pointnet: true
-    init_dim: 64
-    hidden_dim1: 256
-    hidden_dim2: 64
+    name: 'pn'
     scale: 0.001

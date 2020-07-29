@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 from meshgen_utils import utils
-from models import MeshRefineGCN
+from models import MeshRefineGCN, MeshRefinePN
 
 project_root = Path(__file__).absolute().parent
 
@@ -17,7 +17,12 @@ def main(args):
     logger = TensorBoardLogger('logs/', name=train_name)
     logger.log_hyperparams(OmegaConf.to_container(hp))
 
-    net = MeshRefineGCN(hp)
+    if hp.model.name == 'gcn':
+        net = MeshRefineGCN(hp)
+    elif hp.model.name == 'pn':
+        net = MeshRefinePN(hp)
+    else:
+        raise ValueError("Invalid model name: %s" % hp.model.name)
 
     trainer = Trainer(
         logger=logger,

@@ -37,7 +37,7 @@ class MeshRefineGCN(BaseModule):
         # Return estimated coordinate differences of each vertices
         # how to add vertices?
 
-        # coordinates of vertices (temporary)
+        # coordinates of vertices
         verts = mesh.verts_padded()[0]
         vfeat0 = self.feature(verts)
         # norms = mesh.verts_normals_padded()[0]
