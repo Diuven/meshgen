@@ -19,7 +19,11 @@ def main(args):
 
     net = MeshRefineGCN(hp)
 
-    trainer = Trainer(logger=logger, max_epochs=args.max_epochs, gpus=-1)
+    trainer = Trainer(
+        logger=logger,
+        max_epochs=args.max_epochs,
+        gpus=-1,
+        default_root_dir='logs')
     trainer.fit(net)
     
     mesh, pcd = net.current_mesh, net.source_pcd
