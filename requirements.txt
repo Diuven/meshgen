@@ -1,0 +1,20 @@
+torch==1.4.0
+torchvision==0.5.0
+pytorch-lightning==0.8.5
+fvcore
+open3d==0.10
+omegaconf==2.0.0
+tqdm==4.48.0
+imageio
+Pillow
+scikit-image
+opencv-python
+wandb
+tensorboardx
+# from https://pytorch-geometric.com/whl/torch-1.4.0.html
+torch-scatter==latest+cu101
+torch-sparse==latest+cu101
+torch-cluster==latest+cu101
+torch-spline-conv==latest+cu101
+torch-geometric
+# pytorch3d==0.2.0
