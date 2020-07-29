@@ -7,6 +7,15 @@ def o3d_visualize(geometries, overlay=False):
     parameters:
         single object, or list of objects
     """
+
+    try:
+        vis = o3d.visualization.Visualizer()
+        vis.create_window()
+        vis.destroy_window()
+    except RuntimeError:
+        print("Visualization not possible in this enviornment.")
+        return
+
     if isinstance(geometries, list):
         for geo in geometries:
             if isinstance(geo, o3d.geometry.TriangleMesh):
@@ -132,7 +141,11 @@ def get_keybindings(geometries, overlay):
             show_deform.geo = (geometries[2] if len(geometries) == 3 else None)
 
             helpstring += '\nD: toggle mesh deform vector visibility'
-            keybindings[ord('d')] = keybindings[ord('D')] = show_deform
+        else:
+            # blank function for blocking default action
+            def show_deform(vis):
+                return False
+        keybindings[ord('d')] = keybindings[ord('D')] = show_deform
 
     helpstring += '\nEnjoy!'
     print(helpstring, flush=True)
