@@ -1,5 +1,6 @@
 # Based on pytorch geometry's example 
 # https://github.com/rusty1s/pytorch_geometric/blob/master/examples/pointnet2_segmentation.py
+# Removed FC layers as we're using PN to extract features
 
 import torch
 import torch.nn.functional as F
@@ -71,11 +72,7 @@ class PointNet2(torch.nn.Module):
 
         self.fp3_module = FPModule(1, MLP([1024 + 256, 256, 256]))
         self.fp2_module = FPModule(3, MLP([256 + 128, 256, 128]))
-        self.fp1_module = FPModule(3, MLP([128 + 0, 128, 128, 128]))
-
-        self.lin1 = torch.nn.Linear(128, 128)
-        self.lin2 = torch.nn.Linear(128, 128)
-        self.lin3 = torch.nn.Linear(128, last_dim)
+        self.fp1_module = FPModule(3, MLP([128 + 0, 128, 128, last_dim]))
 
     def forward(self, verts):
         sa0_out = (None, verts, torch.zeros(verts.size(0)).to(device=verts.device, dtype=torch.long))
@@ -86,11 +83,5 @@ class PointNet2(torch.nn.Module):
         fp3_out = self.fp3_module(*sa3_out, *sa2_out)
         fp2_out = self.fp2_module(*fp3_out, *sa1_out)
         x, _, _ = self.fp1_module(*fp2_out, *sa0_out)
-
-        x = F.relu(self.lin1(x))
-        x = F.dropout(x, p=0.5, training=self.training)
-        x = self.lin2(x)
-        x = F.dropout(x, p=0.5, training=self.training)
-        x = self.lin3(x)
 
         return x

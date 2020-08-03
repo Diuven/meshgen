@@ -7,4 +7,10 @@ train:
     lr: 0.05
 model:
     name: 'pn'
-    scale: 0.001
+    scale: 0.01
+loss:
+    face: 0.
+    edge: 0.
+    point: 0.
+    length: 5.
+    sample: 1.

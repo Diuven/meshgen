@@ -7,21 +7,18 @@ from abc import ABC, abstractmethod
 from omegaconf import OmegaConf
 import os
 
-from .loss import mesh_to_pcd_distance
+from .loss import Loss
 from meshgen_utils import utils
 
 class BaseModule(LightningModule, ABC):
     def __init__(self, hp):
         super().__init__()
         self.hp = hp
+        # self.get_loss = Loss(hp)
     
     @abstractmethod
     def next_mesh(self, mesh):
         pass
-
-    def get_loss(self, mesh):
-        loss = mesh_to_pcd_distance(mesh, self.source_pcd)
-        return loss
 
     def configure_optimizers(self):
         return SGD(self.parameters(), lr=self.hp.train.lr)
@@ -60,6 +57,7 @@ class BaseModule(LightningModule, ABC):
         self.initial_mesh = self.current_mesh = mesh.to(device='cuda')
         self.source_pcd = pcd.to(device='cuda')
         self.log_mesh(self.initial_mesh, 'initial mesh')
+        self.get_loss = Loss(self.hp, self.source_pcd)
         
         # dataset device?
         dataset = torch.zeros(self.hp.train.epoch_size) # placeholder dataset

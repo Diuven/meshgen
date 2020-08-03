@@ -13,7 +13,7 @@ project_root = Path(__file__).absolute().parent
 def main(args):
     hp = OmegaConf.load(args.config)
 
-    train_name = "GCN_%s" % (Path(hp.data.file).stem)
+    train_name = "%s_%s" % (hp.model.name.upper(), Path(hp.data.file).stem)
     logger = TensorBoardLogger('logs/', name=train_name)
     logger.log_hyperparams(OmegaConf.to_container(hp))
 
