@@ -32,6 +32,7 @@ def main(args):
     trainer.fit(net)
     
     mesh, pcd = net.current_mesh, net.source_pcd
+    net.get_loss.show(mesh)
     utils.show_overlay(mesh, pcd)
     utils.save_result(os.path.join(logger.log_dir, 'objects'), -1, mesh, pcd)
     print("Done!")

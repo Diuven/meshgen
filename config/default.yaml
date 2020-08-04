@@ -4,13 +4,11 @@ data:
     divide: 1
 train:
     epoch_size: 32
-    lr: 0.05
+    lr: 0.005
 model:
     name: 'pn'
     scale: 0.01
 loss:
-    face: 0.
-    edge: 0.
-    point: 0.
-    length: 5.
+    length: .1
+    normal: 5.
     sample: 1.

@@ -56,8 +56,10 @@ class BaseModule(LightningModule, ABC):
         mesh, pcd = utils.initial_data(dhp.file, method=dhp.method, divide_mesh=dhp.divide, **kargs)
         self.initial_mesh = self.current_mesh = mesh.to(device='cuda')
         self.source_pcd = pcd.to(device='cuda')
+
         self.log_mesh(self.initial_mesh, 'initial mesh')
         self.get_loss = Loss(self.hp, self.source_pcd)
+        self.get_loss.show(self.initial_mesh)
         
         # dataset device?
         dataset = torch.zeros(self.hp.train.epoch_size) # placeholder dataset
