@@ -50,7 +50,6 @@ class Loss:
     def show(self, mesh, pcd=None):
         if pcd is None: pcd = self.pcd
         losses = self.compute_loss(mesh, pcd)
-        print("ASDAS: {losses[0]: 2.6f}".format(losses=losses))
         print("Losses: \
             \n pcd to face : {losses[0]: 2.6f} * {coef[0]: 1.2f} \
             \n pcd to edge : {losses[1]: 2.6f} * {coef[1]: 1.2f} \

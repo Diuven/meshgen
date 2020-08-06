@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 
 from meshgen_utils import utils
-from models import MeshRefineGCN, MeshRefinePN
+from models import MeshRefineGCN, MeshRefinePN, CondenseMesh
 
 project_root = Path(__file__).absolute().parent
 
@@ -21,6 +21,8 @@ def main(args):
         net = MeshRefineGCN(hp)
     elif hp.model.name == 'pn':
         net = MeshRefinePN(hp)
+    elif hp.model.name == 'zero':
+        net = CondenseMesh(hp)
     else:
         raise ValueError("Invalid model name: %s" % hp.model.name)
 
@@ -32,7 +34,8 @@ def main(args):
     trainer.fit(net)
     
     mesh, pcd = net.current_mesh, net.source_pcd
-    net.get_loss.show(mesh)
+    if hp.model.name != 'zero':
+        net.get_loss.show(mesh)
     utils.show_overlay(mesh, pcd)
     utils.save_result(os.path.join(logger.log_dir, 'objects'), -1, mesh, pcd)
     print("Done!")
@@ -40,7 +43,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument('--config', type=str, default='config/default.yaml')
+    parser.add_argument('--config', type=str, default='config/test.yaml')
     parser.add_argument('--max_epochs', type=int, default=10000)
     # checkpoint
 
